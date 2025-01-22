@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>멀티샵 국가별 시간</title>
     <style>
-        /* 이전 스타일 코드는 동일하게 유지 */
         * {
             margin: 0;
             padding: 0;
@@ -61,7 +60,7 @@
 
         .time-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 15px;
         }
 
@@ -92,6 +91,12 @@
         .time {
             font-size: 1.2em;
             color: #2c3e50;
+            margin-top: 5px;
+        }
+
+        .date {
+            font-size: 0.9em;
+            color: #7f8c8d;
             margin-top: 5px;
         }
 
@@ -172,7 +177,7 @@
         <div class="converter">
             <h2>시간 변환기</h2>
             <div class="converter-form">
-                <input type="time" id="koreaTime" value="00:00">
+                <input type="datetime-local" id="koreaTime">
                 <select id="citySelect">
                     <!-- JavaScript로 채워질 예정 -->
                 </select>
@@ -220,16 +225,11 @@
         }
 
         function getLocalTime(utcOffset, isDST, currentDate) {
-            // UTC 시간 구하기
             const utcMillis = currentDate.getTime() + currentDate.getTimezoneOffset() * 60000;
-            
-            // 해당 도시의 오프셋 적용
             let targetOffset = utcOffset;
             if (isDST && isDST(currentDate)) {
                 targetOffset += 1;
             }
-            
-            // 밀리초 단위로 정확한 시간 계산
             return new Date(utcMillis + (targetOffset * 3600000));
         }
 
@@ -239,6 +239,15 @@
                 minute: '2-digit',
                 second: '2-digit',
                 hour12: false
+            });
+        }
+
+        function formatDate(date) {
+            return date.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'long'
             });
         }
 
@@ -252,6 +261,7 @@
                 cityList.forEach(city => {
                     const cityTime = getLocalTime(city.utcOffset, city.dst ? isDST : null, now);
                     const timeString = formatTime(cityTime);
+                    const dateString = formatDate(cityTime);
                     
                     const card = document.createElement('div');
                     card.className = 'time-card';
@@ -261,6 +271,7 @@
                             ${city.dst && isDST(now) ? '<span class="dst-tag">DST</span>' : ''}
                         </div>
                         <div class="time">${timeString}</div>
+                        <div class="date">${dateString}</div>
                     `;
                     container.appendChild(card);
                 });
@@ -286,25 +297,40 @@
         }
 
         function convertTime() {
-            const koreaTime = document.getElementById('koreaTime').value;
+            const koreaDateTime = document.getElementById('koreaTime').value;
+            if (!koreaDateTime) {
+                alert('날짜와 시간을 선택해주세요.');
+                return;
+            }
+
             const selectedValue = JSON.parse(document.getElementById('citySelect').value);
             const selectedCity = document.getElementById('citySelect').options[document.getElementById('citySelect').selectedIndex].text;
             
-            const [hours, minutes] = koreaTime.split(':').map(Number);
-            const now = new Date();
-            now.setHours(hours, minutes, 0, 0);
+            const inputDate = new Date(koreaDateTime);
+            const targetTime = getLocalTime(selectedValue.utcOffset, selectedValue.dst ? isDST : null, inputDate);
             
-            const targetTime = getLocalTime(selectedValue.utcOffset, selectedValue.dst ? isDST : null, now);
-            const result = `${selectedCity} 시간: ${formatTime(targetTime)}`;
-            document.getElementById('convertResult').textContent = result;
+            const result = `${selectedCity}\n시간: ${formatTime(targetTime)}\n날짜: ${formatDate(targetTime)}`;
+            document.getElementById('convertResult').innerHTML = result.replace(/\n/g, '<br>');
+        }
+
+        // 현재 날짜/시간으로 datetime-local 입력값 초기화
+        function initializeDateTimeInput() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            
+            document.getElementById('koreaTime').value = `${year}-${month}-${day}T${hours}:${minutes}`;
         }
 
         // 초기화
+        initializeDateTimeInput();
         populateSelect();
         updateTimes();
         // 1초마다 시간 업데이트
         setInterval(updateTimes, 1000);
-
     </script>
 </body>
 </html>
