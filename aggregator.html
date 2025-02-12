@@ -23,12 +23,51 @@
             cursor: pointer;
         }
         
-        .url-input {
-            width: 500px;
+        .url-select {
+            width: 80%;
             padding: 10px;
             font-size: 16px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .text-display {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+
+        .description-container {
+            width: 100%;
+            max-width: 400px;
+            margin-top: 20px;
+        }
+
+        .description-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+            text-align: left;
+        }
+
+        .char-counter {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .description {
+            width: 80%;
+            height: 300px;
+            /* min-height: 100px; */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -36,23 +75,62 @@
     <div class="banner" onclick="openUrl()">
         <img src="/api/placeholder/400/200" alt="Banner Image"/>
     </div>
-    <input 
-        type="text" 
-        class="url-input" 
-        id="urlInput" 
-        placeholder="링크 URL을 입력하세요"
-        value="https://naver.com"
-    >
+    <select class="url-select" id="urlSelect" onchange="updateText()">
+        <option value="https://gp1qa.lg.com/in/partners?code=075c08cb7c2ee9adcb3369561f4ddca649724b1e43a692fc8d56b6b40d8f2c91" data-type="main">https://gp1qa.lg.com/in/partners?code=075c08cb7c2ee9adcb3369561f4ddca649724b1e43a692fc8d56b6b40d8f2c91</option>
+        <option value="https://gp1qa.lg.com/in/partners?partial=misterkim&code=1ba0d28e28131906fefd488f0f1ca916beeee79b0fec06ed1f49fca71c446565" data-type="sub">https://gp1qa.lg.com/in/partners?partial=misterkim&code=1ba0d28e28131906fefd488f0f1ca916beeee79b0fec06ed1f49fca71c446565</option>
+    </select>
+    <div id="textDisplay" class="text-display"></div>
+
+    <div class="description-container"></div>
+        <div class="description-header">
+            <label for="description">[Example]</label>
+            <!-- <span class="char-counter">(<span id="charCount">0</span>/200자)</span> -->
+        </div>
+        <textarea 
+            id="description" 
+            class="description" 
+            readonly
+        >
+        magento 에 aggregator 를 등록하기 위해서는 2가지 방식을 제공 합니다.
+
+        1) URL 일치
+        2) URL 부분 일치
+
+        1번으로 등록 할 경우 호스트의 정보만 등록하면 됩니다.
+        2번으로 등록 할 경우 test 또는 test.c 등 일부분만 매칭 되면 됩니다.
+        
+        https://www.test.com/path1/path2
+        프로토콜 : https
+        호스트 : www.test.com
+        경로 : /path1/path2
+    </textarea>
+    </div>
     
     <script>
         function openUrl() {
-            const url = document.getElementById('urlInput').value;
+            const select = document.getElementById('urlSelect');
+            const url = select.value;
             if (url) {
                 window.open(url, '_blank');
-            } else {
-                alert('URL을 입력해주세요');
             }
         }
+
+        function updateText() {
+            const select = document.getElementById('urlSelect');
+            const selectedOption = select.options[select.selectedIndex];
+            const textDisplay = document.getElementById('textDisplay');
+            
+            const type = selectedOption.getAttribute('data-type');
+            
+            if (type === 'main') {
+                textDisplay.textContent = 'URL 일치';
+            } else if (type === 'sub') {
+                textDisplay.textContent = 'URL 부분 일치';
+            }
+        }
+
+        // 페이지 로드 시 초기 텍스트 설정
+        updateText();
     </script>
 </body>
 </html>
