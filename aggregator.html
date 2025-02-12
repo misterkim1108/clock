@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        .banner {
+            width: 400px;
+            height: 200px;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        
+        .url-input {
+            width: 500px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="banner" onclick="openUrl()">
+        <img src="/api/placeholder/400/200" alt="Banner Image"/>
+    </div>
+    <input 
+        type="text" 
+        class="url-input" 
+        id="urlInput" 
+        placeholder="링크 URL을 입력하세요"
+        value="https://naver.com"
+    >
+    
+    <script>
+        function openUrl() {
+            const url = document.getElementById('urlInput').value;
+            if (url) {
+                window.open(url, '_blank');
+            } else {
+                alert('URL을 입력해주세요');
+            }
+        }
+    </script>
+</body>
+</html>
